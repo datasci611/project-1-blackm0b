@@ -1,0 +1,89 @@
+---
+title: "Matthew Rich Project-1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(grid)
+library(gridExtra)
+rm(list=ls()) 
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Figure 1 
+
+
+```{r, echo=FALSE}
+
+
+data(rock)
+g.top <- rock %>% 
+  ggplot(mapping = aes( x= area,  y=  peri)) + 
+    geom_point(color = 'red') +
+    geom_smooth(se = FALSE,method='lm') +
+    xlab('area(pixels)') +
+    ylab('Perimeter(pixels)') +
+    theme_classic() +
+    theme(plot.margin = unit(c(-1,6,-25,1),units="points"))
+g.bottom <- rock %>% 
+  ggplot(mapping = aes(x= area, y=perm)) + 
+    geom_point(color = 'blue') +
+    geom_smooth(se = FALSE,method='lm') +
+    xlab('area(pixels)') +
+    ylab('Permeability (milli-Darcies)') +
+    theme_classic() +
+    theme(plot.margin = unit(c(0,5,1,1),units="points")) 
+grid.arrange(g.top,g.bottom, heights = c(1/5, 4/5)) 
+```
+
+Ronit Katz from the Oxford University performed image analysis on 48 different rock samples from a petroleum reservoir  on behalf of BP Research. The dataset contains information about the porosity of each sample. The relationship between pore perimeter and pore area for each rock sample as expected and denoted by the by the regression line overlay-ed on the scatter plot. What was unexpected is the correlation between pore area and the permeability measurement, which appears to be insensitive to the actual pore area present in the sample. This is counter-intuitive since pores are the void volume from which fluids may pass through the rock. This data suggests that the permeability may be dependent on another attribute of the sample. 
+
+## Figure 2
+
+```{r, echo=FALSE}
+  data(occupationalStatus)
+  occupationalStatus %>%
+  as_tibble() %>%
+  ggplot(aes(origin,destination)) + 
+    geom_tile(aes(fill=n))  +
+    scale_fill_gradient(low = "white", high = "steelblue") +
+    theme_grey() + 
+    labs(x = "Father occupation status", y = "Son's occupation status") + 
+    scale_x_discrete(expand = c(0, 0)) +
+    scale_y_discrete(expand = c(0, 0)) 
+
+```
+
+The heat-map above summarizes the results of a study on economic mobility in the United Kingdom by from a study performed in 1972 by Goodman et al.. The economic status of each individuals segmented into eight groups with “8” being the most affluent. The results of the study, 3498 father-son pairings, does not convey that the UK permits much upward mobility. Examining the least fortunate group of the 1 classification, the highest count is for the son to be confined to the same economic classification. That trend does not hold for the higher categories suggesting that other factors come into play after certain threshold of financial resources has been met. At the other end of the spectrum, ones ability to outperform the previous generation seems more common. 
+
+## Figure 3
+
+```{r, echo=FALSE}
+  data(quakes)  
+  quakes %>%
+  as_tibble() %>%
+  ggplot() +
+    geom_point(mapping = aes(lat,long, color = cut_width(depth,200), size = mag), alpha = 0.15, position = "jitter") + 
+    labs(x = "magnitude (-)", y = "Son's occupation st")
+    
+```
+
+The chart above maps out the locations of earthquakes near the Fiji islands that had a magnitude greater than 4. This was a longitudinal study that began capturing data from 1964 onwards. A feature that present in the data is the predictable nature of the quakes in relation to other quakes with similar characteristics. More than likely following fault lines in the earths crust, you can see segmentation of both depth and magnitude that is highly dependent on coordinates. Surprisingly there isn't much heterogeneity in the bunches in terms of depth. 
+
+
+## Figure 4
+```{r, echo=FALSE}
+  data(infert)
+  infert %>% 
+  as_tibble() %>%
+  gather(key = 'type', 'count',induced,spontaneous,factor_key=TRUE) %>%
+  mutate(case = case_when( case == 0 ~ "control", case == 1 ~ "treatment")) %>% 
+  ggplot () +
+    geom_point(alpha = 0.2, mapping = aes(age,as.factor(count), size = stratum, color = as.factor(type)), 
+               stat = 'identity',position =  position_jitter(width = 0, height = 0.2)) +
+    facet_grid(case ~ education) + 
+    theme_linedraw()
+```
+
+The work of Trichpoulos et al revolved around understanding the impact of induced abortions and the likelyhood of subsequent spontaneous abortions. Controling for various clinical factors the team formed treatmnent-control pairs allowing for some assement of causality. The control group has lower rates of spontaneous abortion though both groups show increased activity with increasing education level, which is peculiar. While the treatment group has more instances of spontaneous abortion, the difference between the two groups. 
